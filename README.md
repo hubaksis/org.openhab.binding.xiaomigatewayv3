@@ -1,6 +1,6 @@
 # XiaomiGatewayV3 Binding
 
-This repository serves as host for the documentation and the issue tracker for Xiaomi Gateway V3 binding.
+This repository serves as host for the documentation and the issue tracker for Xiaomi Gateway V3 binding for [OpenHab](https://openhab.org).
 This binding works with Xiaomi Gateway 3 (ZNDMWG03LM) device.
 
 All ideas were taken from https://github.com/AlexxIT/XiaomiGateway3
