@@ -21,7 +21,13 @@ No auto-discovery for now.
 ## Binding Configuration
 
 1. Configure the gateway as discribed here: https://github.com/AlexxIT/XiaomiGateway3
-Checkpoint: you should be able to connect to the gateway with a MQTT client (for example - [MQTT Explorer](http://mqtt-explorer.com/)) and see incoming messages in zigbee/send queue.
+
+After you deal with firmware you need to enable telnet and enable remote MQTT access (after each restart) as described [here](https://community.openhab.org/t/zndmwg03lm-xiaomi-gateway-3/111168/3?u=dexter). 
+This will be done later by the binding. 
+
+
+Important checkpoint after this step: you should be able to connect to the gateway with a MQTT client (for example - [MQTT Explorer](http://mqtt-explorer.com/)) and see incoming messages in zigbee/send queue.
+
 
 2. Create a bridge, setting IP address to the IP address of your gateway.
 
