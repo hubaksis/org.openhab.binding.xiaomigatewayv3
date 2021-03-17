@@ -170,10 +170,10 @@
 		<state pattern="%d" readOnly="true"/>
 	</channel-type>
 
-	<channel-type id="illumination">
+	<channel-type id="illumination"> 
 		<item-type>Number</item-type>
 		<label>Illumination (Lux)</label>
-		<description>Illumination (Lux) - active, sent when motion happens</description> 
+		<description>Illumination (Lux) - active (sent when motion happens)</description> 
 		<state pattern="%d Lux" readOnly="true"/>
 	</channel-type>
 
