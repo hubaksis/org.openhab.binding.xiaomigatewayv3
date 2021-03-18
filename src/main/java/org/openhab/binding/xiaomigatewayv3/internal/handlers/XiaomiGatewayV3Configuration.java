@@ -13,21 +13,22 @@
 package org.openhab.binding.xiaomigatewayv3.internal.handlers;
 
 
-import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.eclipse.jdt.annotation.Nullable;
-
 /**
  * The {@link XiaomiGatewayV3Configuration} class contains fields mapping thing configuration parameters.
  *
  * @author hubaksis - Initial contribution
+ * 
+ * Code copied from miio binding
  */
 
-@NonNullByDefault
+@SuppressWarnings("null")
 public class XiaomiGatewayV3Configuration {
-
-    /**
-     * Sample configuration parameter. Replace with your own.
-     */
-    @Nullable
-    public String config1;
+    public String host;
+    public String token;
+    public String deviceId;    
+    public String model; 
+    public String communication; 
+    public int refreshInterval;
+    public int timeout; 
+    public String cloudServer; 
 }

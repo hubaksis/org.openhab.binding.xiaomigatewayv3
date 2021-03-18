@@ -14,6 +14,13 @@ package org.openhab.binding.xiaomigatewayv3.internal;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.core.thing.ThingTypeUID;
+import org.openhab.core.OpenHAB;
+import java.io.File;
+
+import java.util.Collections;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * The {@link XiaomiGatewayV3BindingConstants} class defines common constants, which are
@@ -22,9 +29,9 @@ import org.openhab.core.thing.ThingTypeUID;
  * @author hubaksis - Initial contribution
  */
 @NonNullByDefault
-public class XiaomiGatewayV3BindingConstants {
+public final class XiaomiGatewayV3BindingConstants {
 
-    private static final String BINDING_ID = "xiaomigatewayv3";
+    public static final String BINDING_ID = "xiaomigatewayv3";
 
     public static final String BRIDGE_TYPE_ID = "config";
 
@@ -37,11 +44,24 @@ public class XiaomiGatewayV3BindingConstants {
     // Motion sensor with illuminance (RTCGQ11LM)
     public static final ThingTypeUID THING_TYPE_MOTION_SENSOR_WITH_LUX = new ThingTypeUID(BINDING_ID, "motion_sensor_with_illuminamce");    
 
+    //miio
+    public static final String BINDING_USERDATA_PATH = OpenHAB.getUserDataFolder() + File.separator
+    + XiaomiGatewayV3BindingConstants.BINDING_ID;
+    public static final byte[] DISCOVER_STRING = org.openhab.binding.xiaomigatewayv3.internal.miio.Utils
+            .hexStringToByteArray("21310020ffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+    public static final int PORT = 54321;
+    public static final Set<String> IGNORED_TOKENS = Collections.unmodifiableSet(Stream
+    .of("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", "00000000000000000000000000000000").collect(Collectors.toSet()));
 
+    // Bringe config ids    
+    public static final String PROPERTY_HOST_IP = "host";
+    public static final String PROPERTY_DID = "deviceId";
+    public static final String PROPERTY_TOKEN = "token";
+    public static final String PROPERTY_MODEL = "model";
+    public static final String PROPERTY_REFRESH_INTERVAL = "refreshInterval";
+    public static final String PROPERTY_TIMEOUT = "timeout";
+    public static final String PROPERTY_CLOUDSERVER = "cloudServer";
 
-
-    // Bringe config ids
-    public static final String GATEWAY_IP_ADDRESS = "gateway_ip_address";
 
     // Thing config ids
     public static final String THING_DEVICE_ID = "deviceId";

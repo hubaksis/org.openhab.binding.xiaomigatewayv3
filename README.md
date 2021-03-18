@@ -4,9 +4,17 @@ This repository serves as host for the documentation and the issue tracker for X
 This binding works with Xiaomi Gateway 3 (ZNDMWG03LM) device.
 
 All ideas were taken from https://github.com/AlexxIT/XiaomiGateway3
-Please check AlexxIT for explanation about firmware and how to enable internal MQTT server.
+Please check AlexxIT for explanation about firmware and how to enable passwordless telnet if you haven't done it yet.
 
 The binding is connecting to the internal MQTT queue and parces messages.
+
+When creating a binding you need to set three parameters: IP address, token, device ID.
+
+Token and device ID can be seen in the Mi Home app. Note: deviceId should be HEX value. My app shows decimal value, so I had to convert it from decimal to hex.
+
+While initializing - binding tries to enable telnet service on the device. See details [here](https://community.home-assistant.io/t/xiaomi-mijia-smart-multi-mode-gateway-zndmwg03lm-support/159586/61).
+
+All code for communication via MiIO protocol was taken from miio openhab binding.
 
 
 ## Supported Things
@@ -22,16 +30,11 @@ No auto-discovery for now.
 
 1. Configure the gateway as discribed here: https://github.com/AlexxIT/XiaomiGateway3
 
-After you deal with firmware you need to enable telnet and enable remote MQTT access (after each restart) as described [here](https://community.openhab.org/t/zndmwg03lm-xiaomi-gateway-3/111168/3?u=dexter). 
-This will be done later by the binding. 
-
+2. Create a bridge, set up IP address, token and device ID. The binding automatically turns on telnet and remote MQTT access. 
 
 Important checkpoint after this step: you should be able to connect to the gateway with a MQTT client (for example - [MQTT Explorer](http://mqtt-explorer.com/)) and see incoming messages in zigbee/send queue.
 
-
-2. Create a bridge, setting IP address to the IP address of your gateway.
-
-3. The gateway bridge should be online for now. 
+3. The gateway bridge should be online. 
 
 
 ## Thing Configuration
@@ -39,7 +42,10 @@ Important checkpoint after this step: you should be able to connect to the gatew
 4. Connect a sensor to the gateway using MiHome app.
 
 5. Create a Thing and set Device ID to the sensor ID value. For my sensors it looks like this: 'lumi.12345abcdef123'
-As there is no auto-discovery yet, you should get it from the MQTT client. Trigger a sensor and check the message with 'cmd=report' (not heartbeat) value.   
+
+As there is no auto-discovery yet, you should get it from the MQTT client (or turn on log level to DEBUG and check logs for incoming messages)
+
+Trigger a sensor and check the message with 'cmd=report' (not heartbeat) value.  
 
 6. Setup required channels.
 
@@ -60,6 +66,4 @@ _Note that it is planned to generate some part of this based on the XML files wi
 ## Any custom content here!
 
 
-To compile: run mvn clean install -pl :org.openhab.binding.xiaomigatewayv3 -D"spotless.check.skip"=true
-
-I use command: mvn clean install -D"spotless.check.skip"=true -DskipChecks
+To compile - I use the command: mvn clean install -D"spotless.check.skip"=true -DskipChecks

@@ -41,11 +41,32 @@ import com.google.gson.JsonSyntaxException;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.time.LocalDateTime;
+import java.util.concurrent.TimeUnit;
+
+import org.openhab.core.config.core.Configuration;
+import org.openhab.core.cache.ExpiringCache;
 
 import org.openhab.binding.xiaomigatewayv3.internal.XiaomiGatewayV3BindingConstants;
 import org.openhab.binding.xiaomigatewayv3.internal.json.ZigbeeSendMessage;
 import org.openhab.binding.xiaomigatewayv3.internal.json.ZigbeeSendMessageReport;
 import org.openhab.binding.xiaomigatewayv3.internal.json.ZigbeeSendMessageHeartbeat;
+
+import org.openhab.binding.xiaomigatewayv3.internal.miio.MiIoAsyncCommunication;
+import org.openhab.binding.xiaomigatewayv3.internal.miio.Utils;
+import org.openhab.binding.xiaomigatewayv3.internal.miio.cloud.CloudConnector;
+import org.openhab.binding.xiaomigatewayv3.internal.miio.Message;
+import org.openhab.binding.xiaomigatewayv3.internal.miio.MiIoMessageListener;
+import org.openhab.binding.xiaomigatewayv3.internal.miio.MiIoSendCommand;
+import org.openhab.binding.xiaomigatewayv3.internal.miio.MiIoCryptoException;
+import org.openhab.binding.xiaomigatewayv3.internal.miio.MiIoCrypto;
+import org.openhab.binding.xiaomigatewayv3.internal.miio.MiIoCommand;
+
+import org.openhab.binding.xiaomigatewayv3.internal.helpers.TenletCommunication;
+
+import java.io.IOException;
+
+
 
 /**
  * The {@link XiaomiGatewayV3BridgeHandler} bridgeHandler implementation
@@ -53,18 +74,37 @@ import org.openhab.binding.xiaomigatewayv3.internal.json.ZigbeeSendMessageHeartb
  * @author hubaksis - Initial contribution
  */
 @NonNullByDefault
-public class XiaomiGatewayV3BridgeHandler extends BaseBridgeHandler implements MqttConnectionObserver, MqttMessageSubscriber {
+public class XiaomiGatewayV3BridgeHandler extends BaseBridgeHandler implements MqttConnectionObserver, MqttMessageSubscriber, MiIoMessageListener {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    //private @Nullable XiaomiGatewayV3Configuration config;
+    private @Nullable XiaomiGatewayV3Configuration configuration;
     private @Nullable MqttBrokerConnection connection;
 
     private String topicsToSubscribe = "#";
-    private String gatewayIpAddress = "";
 
-    public XiaomiGatewayV3BridgeHandler(Bridge bridge) {
+    private int connectionMQTTAttempts = 0;
+    private final int MAX_MQTT_CONNECTION_ATTEMPTS = 3;
+    //miio
+    protected @Nullable MiIoAsyncCommunication miioCom;
+    protected byte[] token = new byte[0];
+    protected CloudConnector cloudConnector;
+    protected String cloudServer = "";
+    protected int lastId;
+    protected static final long CACHE_EXPIRY_NETWORK = TimeUnit.SECONDS.toMillis(60);
+    protected final ExpiringCache<String> network = new ExpiringCache<>(CACHE_EXPIRY_NETWORK, () -> {
+        int ret = sendCommand(MiIoCommand.MIIO_INFO);
+        if (ret != 0) {
+            return "id:" + ret;
+        }
+        return "failed";
+    });;
+
+
+    public XiaomiGatewayV3BridgeHandler(Bridge bridge, CloudConnector cloudConnector) {
         super(bridge);
+
+        this.cloudConnector = cloudConnector;
     }
 
     @Override
@@ -74,11 +114,13 @@ public class XiaomiGatewayV3BridgeHandler extends BaseBridgeHandler implements M
 
     @Override
     public void initialize() {
-        //config = getConfigAs(XiaomiGatewayV3Configuration.class);
+        logger.debug("Initializing the bridge handler '{}' with thingType {}", getThing().getUID(),
+                getThing().getThingTypeUID());
 
-        logger.debug("Initializing the bridge"); 
+        final XiaomiGatewayV3Configuration configuration = getConfigAs(XiaomiGatewayV3Configuration.class);
+        this.configuration = configuration;
+        updateStatus(ThingStatus.UNKNOWN);
 
-        // TODO: Initialize the handler.
         // The framework requires you to return from this method quickly. Also, before leaving this method a thing
         // status from one of ONLINE, OFFLINE or UNKNOWN must be set. This might already be the real thing status in
         // case you can decide it directly.
@@ -89,43 +131,35 @@ public class XiaomiGatewayV3BridgeHandler extends BaseBridgeHandler implements M
         // set the thing status to UNKNOWN temporarily and let the background task decide for the real status.
         // the framework is then able to reuse the resources from the thing handler initialization.
         // we set this upfront to reliably check status updates in unit tests.
-        updateStatus(ThingStatus.UNKNOWN);
 
-        // Example for background initialization:
-        scheduler.execute(() -> {
-            //boolean thingReachable = true; // <background task with long running initialization here>
-            
-            Object ipAddressObject = thing.getConfiguration().get(XiaomiGatewayV3BindingConstants.GATEWAY_IP_ADDRESS);
-            String ipAddress = (String) ipAddressObject;        
+        if (configuration.host == null || configuration.host.isEmpty()) {
+            updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.CONFIGURATION_ERROR,
+                    "IP address required. Configure IP address");
+            return;
+        }
+        if (!tokenCheckPass(configuration.token)) {
+            updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.CONFIGURATION_ERROR, "Token required. Configure token");
+            return;
+        }
 
-            logger.debug("IP address: {}", ipAddress); 
-            //thingReachable = ipAddress.contains("123");
+        scheduler.execute(() -> {                        
+            logger.debug("IP address: {}", configuration.host); 
 
             try {
-                if(!gatewayIpAddress.equals(ipAddress)){
-                    gatewayIpAddress = ipAddress;
-                    connectMQTT();
-                }
-                //updateStatus(ThingStatus.ONLINE);
+                setupXiaomiGateway();
+                //start MQTT client despite the result of the configuration
+                connectMQTT();
+
+                //something connected with config changed - not needed for now
+                // if(!gatewayIpAddress.equals(configuration.host)){
+                //     gatewayIpAddress = configuration.host;
+                //     connectMQTT();
+                // }
             } catch (Exception e) {
                 logger.warn("Error connecting to the queue: {}", e.toString());
                 updateStatus(ThingStatus.OFFLINE);
             }
-
-             
-
-            // if (thingReachable) {
-            //     updateStatus(ThingStatus.ONLINE);
-            // } else {
-            //     updateStatus(ThingStatus.OFFLINE);
-            // }
         });
-
-
-        // These logging types should be primarily used by bindings
-        // logger.trace("Example trace message");
-        // logger.debug("Example debug message");
-        // logger.warn("Example warn message");
 
         // Note: When initialization can NOT be done set the status with more details for further
         // analysis. See also class ThingStatusDetail for all available status details.
@@ -134,6 +168,14 @@ public class XiaomiGatewayV3BridgeHandler extends BaseBridgeHandler implements M
         // "Can not access device as username and/or password are invalid");
     }
 
+    /**
+     * This method setups Xiaomi Gateway.
+     * - enables telnet via miio protocol
+     * - enables remote MQTT server connection
+     */
+    private void setupXiaomiGateway(){
+        sendCommand(MiIoCommand.TELNET_ENABLE);  
+    }
 
     public void connectMQTT() {
         MqttBrokerConnection localConnection = null;
@@ -145,7 +187,7 @@ public class XiaomiGatewayV3BridgeHandler extends BaseBridgeHandler implements M
 
         logger.debug("Creating a new instance of MqttBrokerConnection"); 
 
-        localConnection = new MqttBrokerConnection(gatewayIpAddress, 1883, false, "sgbinding1");
+        localConnection = new MqttBrokerConnection(configuration.host, 1883, false, "sgbinding1");
 
         if (localConnection != null) {
             localConnection.setKeepAliveInterval(20);
@@ -186,6 +228,12 @@ public class XiaomiGatewayV3BridgeHandler extends BaseBridgeHandler implements M
     }
 
 
+    /**
+     * Will return filtered by type things list, connected to the bridge. 
+     * Returns all things for now.
+     * 
+     * @return 
+     */
     private List<Thing> getFilteredDevicesList(){
         //ThingTypeUID deviceUid = THING_TYPE_DOOR_SENSOR;
         List<Thing> allThingsFiltered = getThing().getThings();
@@ -201,10 +249,8 @@ public class XiaomiGatewayV3BridgeHandler extends BaseBridgeHandler implements M
             if (message == null) {
                 logger.warn("Can't parse json (null): {}", state);
             } else {
-                //logger.info("Received params"); 
                 if(message.params.size() != 0)
                     {
-                        //logger.info("Received {}: {}", message.params.get(0).Name, message.params.get(0).Value.toString());                        
                         for (Thing thing : getFilteredDevicesList()) {                            
                             Object thingDId = thing.getConfiguration().get(XiaomiGatewayV3BindingConstants.THING_DEVICE_ID);
                             if(thingDId != null && thingDId.toString().equals(message.getDeviceId())){
@@ -226,12 +272,10 @@ public class XiaomiGatewayV3BridgeHandler extends BaseBridgeHandler implements M
             if (message == null) {
                 logger.warn("Can't parse json (null): {}", state);
             } else {
-                //logger.info("Received params"); 
                 if(message.getFirstParam() != null                                 
                                 && message.getFirstParam().res_list != null
                                 && message.getFirstParam().res_list.size() != 0)
                     {
-                        //logger.info("Received {}: {}", message.params.get(0).Name, message.params.get(0).Value.toString());
                         for (Thing thing : getFilteredDevicesList()) {                            
                             Object thingDId = thing.getConfiguration().get(XiaomiGatewayV3BindingConstants.THING_DEVICE_ID);
                             if(thingDId != null && thingDId.toString().equals(message.getFirstParam().getDeviceId())){
@@ -252,16 +296,12 @@ public class XiaomiGatewayV3BridgeHandler extends BaseBridgeHandler implements M
             if (message == null) {
                 logger.warn("Can't parse json (null): {}", state);
             } else {
-                //parsing the message
                 if(message.getCmd().equals("report")){
-                    //logger.info("Parsing a message like a report");
                     processMessageAsReport(state);
                 } else if (message.getCmd().equals("heartbeat")){
-                    //logger.info("Parsing a message like a heartbeat");
                     processMessageAsHeartbeat(state);
                 }
             }
-            //return new DeviceCollection(devices);
         } catch (JsonSyntaxException e) {
             logger.warn("Can't parse json: {}", state);
         }
@@ -293,8 +333,12 @@ public class XiaomiGatewayV3BridgeHandler extends BaseBridgeHandler implements M
                 updateStatus(ThingStatus.ONLINE);
                 break;
             case CONNECTING:
-                //updateStatus(ThingStatus.UNKNOWN);
-                //break;
+                connectionMQTTAttempts++;
+                if(connectionMQTTAttempts > MAX_MQTT_CONNECTION_ATTEMPTS){
+                    connectionMQTTAttempts = 0;
+                    setupXiaomiGateway();
+                }
+                break;
             case DISCONNECTED:
                 updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR,
                         "Bridge (broker) cannot connect to the MQTT gateway.");
@@ -308,6 +352,231 @@ public class XiaomiGatewayV3BridgeHandler extends BaseBridgeHandler implements M
         if (localConnection != null) {
             localConnection.unsubscribe(topicsToSubscribe, this);
             localConnection.stop();
+        }
+    }
+
+    //miio
+    protected synchronized @Nullable MiIoAsyncCommunication getConnection() {
+        if (miioCom != null) {
+            return miioCom;
+        }
+        final XiaomiGatewayV3Configuration configuration = getConfigAs(XiaomiGatewayV3Configuration.class);
+        if (configuration.host == null || configuration.host.isEmpty()) {
+            return null;
+        }
+        @Nullable
+        String deviceId = configuration.deviceId;
+        try {
+            if (deviceId != null && deviceId.length() == 8 && tokenCheckPass(configuration.token)) {
+                final MiIoAsyncCommunication miioCom = new MiIoAsyncCommunication(configuration.host, token,
+                        Utils.hexStringToByteArray(deviceId), lastId, configuration.timeout, cloudConnector);
+                if (getCloudServer().isBlank()) {
+                    logger.debug("Ping Mi device {} at {}", deviceId, configuration.host);
+                    Message miIoResponse = miioCom.sendPing(configuration.host);
+                    if (miIoResponse != null) {
+                        logger.debug("Ping response from device {} at {}. Time stamp: {}, OH time {}, delta {}",
+                                Utils.getHex(miIoResponse.getDeviceId()), configuration.host,
+                                miIoResponse.getTimestamp(), LocalDateTime.now(), miioCom.getTimeDelta());
+                        miioCom.registerListener(this);
+                        this.miioCom = miioCom;
+                        return miioCom;
+                    } else {
+                        miioCom.close();
+                    }
+                } else {
+                    miioCom.registerListener(this);
+                    this.miioCom = miioCom;
+                    return miioCom;
+                }
+            } else {
+                logger.debug("No device ID defined. Retrieving Mi device ID");
+                final MiIoAsyncCommunication miioCom = new MiIoAsyncCommunication(configuration.host, token,
+                        new byte[0], lastId, configuration.timeout, cloudConnector);
+                Message miIoResponse = miioCom.sendPing(configuration.host);
+                if (miIoResponse != null) {
+                    logger.debug("Ping response from device {} at {}. Time stamp: {}, OH time {}, delta {}",
+                            Utils.getHex(miIoResponse.getDeviceId()), configuration.host, miIoResponse.getTimestamp(),
+                            LocalDateTime.now(), miioCom.getTimeDelta());
+                    deviceId = Utils.getHex(miIoResponse.getDeviceId());
+                    logger.debug("Ping response from device {} at {}. Time stamp: {}, OH time {}, delta {}", deviceId,
+                            configuration.host, miIoResponse.getTimestamp(), LocalDateTime.now(),
+                            miioCom.getTimeDelta());
+                    miioCom.setDeviceId(miIoResponse.getDeviceId());
+                    logger.debug("Using retrieved Mi device ID: {}", deviceId);
+                    updateDeviceIdConfig(deviceId);
+                    miioCom.registerListener(this);
+                    this.miioCom = miioCom;
+                    return miioCom;
+                } else {
+                    miioCom.close();
+                }
+            }
+            logger.debug("Ping response from device {} at {} FAILED", configuration.deviceId, configuration.host);
+            disconnectedNoResponse();
+            return null;
+        } catch (IOException e) {
+            logger.debug("Could not connect to {} at {}", getThing().getUID().toString(), configuration.host);
+            disconnected(e.getMessage());
+            return null;
+        }
+    }
+
+    private void updateDeviceIdConfig(String deviceId) {
+        if (!deviceId.isEmpty()) {
+            updateProperty(Thing.PROPERTY_SERIAL_NUMBER, deviceId);
+            Configuration config = editConfiguration();
+            config.put(PROPERTY_DID, deviceId);
+            updateConfiguration(config);
+        } else {
+            logger.debug("Could not update config with device ID: {}", deviceId);
+        }
+    }
+
+    protected void disconnectedNoResponse() {
+        disconnected("No Response from device");
+    }
+
+    protected void disconnected(@Nullable String message) {
+        updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.OFFLINE.COMMUNICATION_ERROR,
+                message != null ? message : "");
+        final MiIoAsyncCommunication miioCom = this.miioCom;
+        if (miioCom != null) {
+            lastId = miioCom.getId();
+            lastId += 10;
+        }
+    }
+
+
+    String getCloudServer() {
+        // This can be improved in the future with additional / more advanced options like e.g. directFirst which would
+        // use direct communications and in case of failures fall back to cloud communication. For now we keep it
+        // simple and only have the option for cloud or direct.
+        //final XiaomiGatewayV3Configuration configuration = this.configuration;
+        // if (configuration != null && configuration.communication != null) {
+        //     return configuration.communication.equals("cloud") ? cloudServer : "";
+        // }
+        return "";
+    }
+
+    private boolean tokenCheckPass(@Nullable String tokenSting) {
+        if (tokenSting == null) {
+            return false;
+        }
+        switch (tokenSting.length()) {
+            case 16:
+                token = tokenSting.getBytes();
+                return true;
+            case 32:
+                if (!IGNORED_TOKENS.contains(tokenSting)) {
+                    token = Utils.hexStringToByteArray(tokenSting);
+                    return true;
+                }
+                return false;
+            case 96:
+                try {
+                    token = Utils.hexStringToByteArray(MiIoCrypto.decryptToken(Utils.hexStringToByteArray(tokenSting)));
+                    logger.debug("IOS token decrypted to {}", Utils.getHex(token));
+                } catch (MiIoCryptoException e) {
+                    logger.warn("Could not decrypt token {}{}", tokenSting, e.getMessage());
+                    return false;
+                }
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    protected int sendCommand(MiIoCommand command) {
+        return sendCommand(command, "[]");
+    }
+
+    protected int sendCommand(MiIoCommand command, String params) {
+        try {
+            final MiIoAsyncCommunication connection = getConnection();
+            return (connection != null) ? connection.queueCommand(command, params, getCloudServer()) : 0;
+        } catch (MiIoCryptoException | IOException e) {
+            logger.debug("Command {} for {} failed (type: {}): {}", command.toString(), getThing().getUID(),
+                    getThing().getThingTypeUID(), e.getLocalizedMessage());
+        }
+        return 0;
+    }
+
+    protected int sendCommand(String commandString) {
+        return sendCommand(commandString, getCloudServer());
+    }
+
+    /**
+     * This is used to execute arbitrary commands by sending to the commands channel. Command parameters to be added
+     * between
+     * [] brackets. This to allow for unimplemented commands to be executed (e.g. get detailed historical cleaning
+     * records)
+     *
+     * @param commandString command to be executed
+     * @param cloud server to be used or empty string for direct sending to the device
+     * @return vacuum response
+     */
+    protected int sendCommand(String commandString, String cloudServer) {
+        final MiIoAsyncCommunication connection = getConnection();
+        try {
+            String command = commandString.trim();
+            String param = "[]";
+            int sb = command.indexOf("[");
+            int cb = command.indexOf("{");
+            if (Math.max(sb, cb) > 0) {
+                int loc = (Math.min(sb, cb) > 0 ? Math.min(sb, cb) : Math.max(sb, cb));
+                param = command.substring(loc).trim();
+                command = command.substring(0, loc).trim();
+            }
+            return (connection != null) ? connection.queueCommand(command, param, cloudServer) : 0;
+        } catch (MiIoCryptoException | IOException e) {
+            disconnected(e.getMessage());
+        }
+        return 0;
+    }
+
+
+    @Override
+    public void onStatusUpdated(ThingStatus status, ThingStatusDetail statusDetail) {
+        updateStatus(status, statusDetail);
+    }
+
+    @Override
+    public void onMessageReceived(MiIoSendCommand response) {
+        logger.debug("Received response for {} type: {}, result: {}, fullresponse: {}", getThing().getUID().getId(),
+                response.getCommand(), response.getResult(), response.getResponse());
+        if (response.isError()) {
+            logger.debug("Error received: {}", response.getResponse().get("error"));
+            if (MiIoCommand.MIIO_INFO.equals(response.getCommand())) {
+                network.invalidateValue();
+            }
+            return;
+        }
+        try {
+            switch (response.getCommand()) {
+                // case MIIO_INFO:
+                //     if (!isIdentified) {
+                //         defineDeviceType(response.getResult().getAsJsonObject());
+                //     }
+                //     updateNetwork(response.getResult().getAsJsonObject());
+                //     break;
+                case TELNET_ENABLE:
+                    var telnet = new TenletCommunication();
+                    telnet.EnableMqttExternalServer(configuration.host);
+                    break;
+
+                default:
+                    break;
+            }
+            // if (cmds.containsKey(response.getId())) {
+            //     if (response.getCloudServer().isBlank()) {
+            //         updateState(CHANNEL_COMMAND, new StringType(response.getResponse().toString()));
+            //     } else {
+            //         updateState(CHANNEL_RPC, new StringType(response.getResponse().toString()));
+            //     }
+            //     cmds.remove(response.getId());
+            // }
+        } catch (Exception e) {
+            logger.debug("Error while handing message {}", response.getResponse(), e);
         }
     }
 

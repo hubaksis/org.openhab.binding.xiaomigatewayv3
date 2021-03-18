@@ -13,12 +13,18 @@
 			<channel id="bridge_heartbeat" typeId="bridge_heartbeat" />
 		</channels>
 
-		<config-description>
+		<properties>
+			<property name="vendor">Xiaomi</property>
+		</properties>
+
+		<config-description-ref uri="thing-type:xiaomigatewayv3:config"/>
+		<!-- <config-description>
 			<parameter name="gateway_ip_address" type="text" required="true">
 				<label>Connection string</label>
 				<description>Connection string</description>
 			</parameter>
-		</config-description>
+		</config-description> -->
+
 	</bridge-type>
 
 	<!-- Sample Thing Type -->
