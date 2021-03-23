@@ -88,7 +88,9 @@ public enum MiIoCommand {
 
     UNKNOWN(""),
 
-    TELNET_ENABLE("enable_telnet_service");
+    TELNET_ENABLE("enable_telnet_service"),
+    
+    GET_DEVICE_LIST("get_device_list");
 
     private final String command;
 

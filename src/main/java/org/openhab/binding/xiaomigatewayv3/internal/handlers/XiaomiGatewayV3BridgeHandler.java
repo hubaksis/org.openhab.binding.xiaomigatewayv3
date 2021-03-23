@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
  import org.openhab.core.io.transport.mqtt.MqttConnectionObserver;
  import org.openhab.core.io.transport.mqtt.MqttConnectionState;
  import org.openhab.core.io.transport.mqtt.MqttMessageSubscriber;
- import org.openhab.core.thing.ThingTypeUID;
+ //import org.openhab.core.thing.ThingTypeUID;
  
 import org.openhab.core.library.types.StringType;
 
@@ -40,7 +40,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
 import java.util.List;
-import java.util.stream.Collectors;
+//import java.util.stream.Collectors;
 import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
@@ -175,6 +175,7 @@ public class XiaomiGatewayV3BridgeHandler extends BaseBridgeHandler implements M
      */
     private void setupXiaomiGateway(){
         sendCommand(MiIoCommand.TELNET_ENABLE);  
+        sendCommand(MiIoCommand.GET_DEVICE_LIST);          
     }
 
     public void connectMQTT() {
