@@ -21,6 +21,7 @@ All code for communication via MiIO protocol was taken from miio openhab binding
 
 - Xiaomi/Aquara Door Sensor (MCCGQ01LM)
 - Aqara Motion Sensor (RTCGQ11LM)
+- Xiaomi Light Sensor (GZCGQ01LM)
 
 ## Discovery
 
