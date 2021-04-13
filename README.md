@@ -24,7 +24,9 @@ All code for communication via MiIO protocol was taken from miio openhab binding
 
 ## Discovery
 
-No auto-discovery for now.
+The binding can find attached supported ZigBee devices now.
+The binding cannot find gateway itself.
+The binding cannot find bluetooth devices.
 
 ## Binding Configuration
 
