@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<thing:thing-descriptions bindingId="xiaomigatewayv3"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:thing="https://openhab.org/schemas/thing-description/v1.0.0"
+	xsi:schemaLocation="https://openhab.org/schemas/thing-description/v1.0.0 https://openhab.org/schemas/thing-description-1.0.0.xsd">
+
+	<bridge-type id="config">
+		<label>Xiaomi Gateway v3 Bridge</label>
+		<description>Xiaomi Gateway v3 Bridge</description>
+		<category>Bridge</category>
+		
+		<channels>
+			<channel id="bridge_heartbeat" typeId="bridge_heartbeat" />
+		</channels>
+
+		<properties>
+			<property name="vendor">Xiaomi</property>
+		</properties>
+
+		<config-description-ref uri="thing-type:xiaomigatewayv3:config"/>
+		<!-- <config-description>
+			<parameter name="gateway_ip_address" type="text" required="true">
+				<label>Connection string</label>
+				<description>Connection string</description>
+			</parameter>
+		</config-description> -->
+
+	</bridge-type>
+
+	<!-- Aquara door and window sensor (MCCGQ01LM) -->
+	<thing-type id="door_sensor">
+
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="config"/>
+		</supported-bridge-type-refs>
+
+		<label>Door sensor (MCCGQ01LM)</label>
+		<description>Aquara door sensor (MCCGQ01LM)</description>
+
+		<channels>
+			<channel id="door_sensor_state" typeId="door_sensor_state"/>
+
+			<channel id="global_battery_percent" typeId="global_battery_percent"/>
+			<!-- <channel id="global_reset_cnt" typeId="global_reset_cnt"/>
+			<channel id="global_send_all_cnt" typeId="global_send_all_cnt"/>
+			<channel id="global_send_fail_cnt" typeId="global_send_fail_cnt"/>
+			<channel id="global_send_retry_cnt" typeId="global_send_retry_cnt"/>
+			<channel id="global_chip_temperature" typeId="global_chip_temperature"/> -->
+			<channel id="global_battery_voltage" typeId="global_battery_voltage"/>
+
+		</channels>
+
+		<config-description-ref uri="thing-type:xiaomigatewayv3:zigbee:config"/>
+	</thing-type>
+
+	<!-- Motion sensor with illuminance (RTCGQ11LM) -->
+	<thing-type id="motion_sensor_with_illuminance">
+
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="config"/>
+		</supported-bridge-type-refs>
+
+		<label>Motion sensor</label>
+		<description>Aquara motion sensor with illuminance (RTCGQ11LM)</description>
+
+		<channels>
+			<channel id="illuminance_lux" typeId="illuminance_lux"/>
+			<channel id="illumination" typeId="illumination"/>
+			<channel id="motion_sensor_state" typeId="motion_sensor_state"/>
+
+			<channel id="global_battery_percent" typeId="global_battery_percent"/>
+			<channel id="global_battery_voltage" typeId="global_battery_voltage"/>
+
+		</channels>
+
+		<config-description-ref uri="thing-type:xiaomigatewayv3:zigbee:config"/>
+
+	</thing-type>
+
+
+
+
+
+
+	
+	<!-- Bridge channels -->
+	<channel-type id="bridge_heartbeat">
+		<item-type>String</item-type>
+		<label>Bridge heartbeat message</label>
+		<description></description> 
+		<state readOnly="true"/>
+	</channel-type>
+
+	<!-- Global sensor properties-->
+
+	<channel-type id="global_battery_percent">
+		<item-type>Number</item-type>
+		<label>Battery Percentage</label>
+		<description>Battery Percentage</description> 
+		<state min="0" max="100" pattern="%d %%" readOnly="true"/>
+	</channel-type>
+
+	<channel-type id="global_reset_cnt">
+		<item-type>Number</item-type>
+		<label>Reset count</label>
+		<description></description> 
+		<state pattern="%d" readOnly="true"/>
+	</channel-type>
+
+	<channel-type id="global_send_all_cnt">
+		<item-type>Number</item-type>
+		<label>Sent count</label>
+		<description></description> 
+		<state pattern="%d" readOnly="true"/>
+	</channel-type>
+
+	<channel-type id="global_send_fail_cnt">
+		<item-type>Number</item-type>
+		<label>Fail sent count</label>
+		<description></description> 
+		<state pattern="%d" readOnly="true"/>
+	</channel-type>
+
+	<channel-type id="global_send_retry_cnt">
+		<item-type>Number</item-type>
+		<label>Retry sent count</label>
+		<description></description> 
+		<state pattern="%d" readOnly="true"/>
+	</channel-type>
+	
+	<channel-type id="global_chip_temperature">
+		<item-type>Number</item-type>
+		<label>Chip temperature</label>
+		<description></description> 
+		<state pattern="%d" readOnly="true"/>
+	</channel-type>
+	
+	<channel-type id="global_battery_voltage">
+		<item-type>Number</item-type>
+		<label>Battery Voltage</label>
+		<description>Battery Voltage</description> 
+		<state pattern="%d mV" readOnly="true"/>
+	</channel-type>
+	<!-- END: Global sensor properties-->
+
+
+	<!-- Specific device properties-->
+	<!-- Door/window sensor MCCGQ01LM -->
+	<channel-type id="door_sensor_state">
+		<item-type>Contact</item-type>
+		<label>Sensor state</label>
+		<description>Door/window sensor state</description> 
+		<state readOnly="true"/>
+	</channel-type>
+
+	<!-- Motion sensor with illuminance RTCGQ11LM -->
+	<channel-type id="motion_sensor_state">
+		<item-type>Contact</item-type>
+		<label>Sensor state</label>
+		<description>Motion sensor state</description> 
+		<state readOnly="true"/>
+	</channel-type>
+
+	<channel-type id="illuminance_lux">
+		<item-type>Number</item-type>
+		<label>Illumination</label>
+		<description>Illumination (??)</description> 
+		<state pattern="%d" readOnly="true"/>
+	</channel-type>
+
+	<channel-type id="illumination"> 
+		<item-type>Number</item-type>
+		<label>Illumination (Lux)</label>
+		<description>Illumination (Lux) - active (sent when motion happens)</description> 
+		<state pattern="%d Lux" readOnly="true"/>
+	</channel-type>
+
+	<!-- END: Specific device properties-->
+</thing:thing-descriptions>
