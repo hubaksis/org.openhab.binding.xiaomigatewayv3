@@ -40,17 +40,13 @@ Important checkpoint after this step: you should be able to connect to the gatew
 3. The gateway bridge should be online. 
 
 
-## Thing Configuration
+## Automatic Thing Configuration
 
-4. Connect a sensor to the gateway using MiHome app.
+Connect a sensor to the gateway using MiHome app.
 
-5. Create a Thing and set Device ID to the sensor ID value. For my sensors it looks like this: 'lumi.12345abcdef123'
+Things -> (+) -> Select the gateway binding -> Press Scan
 
-As there is no auto-discovery yet, you should get it from the MQTT client (or turn on log level to DEBUG and check logs for incoming messages)
-
-Trigger a sensor and check the message with 'cmd=report' (not heartbeat) value.  
-
-6. Setup required channels.
+All supported devices should be added to your Inbox
 
 
 ## Channels
@@ -71,7 +67,8 @@ _Note that it is planned to generate some part of this based on the XML files wi
 
 To compile - I use the command: mvn clean install -D"spotless.check.skip"=true -DskipChecks
 
-## To add a new device
+## (For developers) to add support of a new ZigBee device
+
 1. XiaomiGatewayV3BindingConstants.java
 
     a. Add a new ThingTypeUID like THING_TYPE_DOOR_SENSOR
