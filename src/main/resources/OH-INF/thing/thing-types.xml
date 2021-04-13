@@ -72,12 +72,23 @@
 			<channel id="global_battery_voltage" typeId="global_battery_voltage"/>
 
 		</channels>
-
 		<config-description-ref uri="thing-type:xiaomigatewayv3:zigbee:config"/>
-
 	</thing-type>
 
+	<thing-type id="light_sensor">
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="config"/>
+		</supported-bridge-type-refs>
 
+		<label>Light sensor</label>
+		<description>Xiaomi light sendor (GZCGQ01LM)</description>
+
+		<channels>
+			<channel id="light_sensor_illuminance" typeId="light_sensor_illuminance"/>
+			<channel id="light_sensor_battery" typeId="light_sensor_battery"/>
+		</channels>
+		<config-description-ref uri="thing-type:xiaomigatewayv3:zigbee:config"/>
+	</thing-type>
 
 
 
@@ -175,5 +186,21 @@
 		<state pattern="%d Lux" readOnly="true"/>
 	</channel-type>
 
+	<channel-type id="light_sensor_illuminance">
+		<item-type>Number</item-type>
+		<label>Illuminance</label>
+		<description>Illuminance (??)</description> 
+		<state pattern="%d" readOnly="true"/>
+	</channel-type>
+
+	<channel-type id="light_sensor_battery">
+		<item-type>Number</item-type>
+		<label>Battery</label>
+		<description>Battery</description> 
+		<state pattern="%d" readOnly="true"/>
+	</channel-type>
+
+
 	<!-- END: Specific device properties-->
+	
 </thing:thing-descriptions>

@@ -47,12 +47,13 @@ public final class XiaomiGatewayV3BindingConstants {
     public static final ThingTypeUID THING_TYPE_DOOR_SENSOR = new ThingTypeUID(BINDING_ID, "door_sensor");    
     // Motion sensor with illuminance (RTCGQ11LM)
     public static final ThingTypeUID THING_TYPE_MOTION_SENSOR_WITH_LUX = new ThingTypeUID(BINDING_ID, "motion_sensor_with_illuminance");    
-
-
+    // Xiaomi light sendor GZCGQ01LM
+    public static final ThingTypeUID THING_TYPE_LIGHT_SENSOR = new ThingTypeUID(BINDING_ID, "light_sensor");    
 
 
     public static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Collections
-            .unmodifiableSet(Stream.of(THING_TYPE_BRIDGE, THING_TYPE_DOOR_SENSOR, THING_TYPE_MOTION_SENSOR_WITH_LUX)
+            .unmodifiableSet(Stream.of(THING_TYPE_BRIDGE, THING_TYPE_DOOR_SENSOR, THING_TYPE_MOTION_SENSOR_WITH_LUX,
+                                    THING_TYPE_LIGHT_SENSOR)
                     .collect(Collectors.toSet()));
                     
     //# All lumi models:
@@ -64,8 +65,9 @@ public final class XiaomiGatewayV3BindingConstants {
             new SimpleEntry<String, ThingDescription>("lumi.sensor_magnet.v2", new ThingDescription("Xiaomi", "Door Sensor", "MCCGQ01LM", THING_TYPE_DOOR_SENSOR)),
             new SimpleEntry<String, ThingDescription>("lumi.sensor_magnet.aq2", new ThingDescription("Aqara", "Door Sensor", "MCCGQ11LM", THING_TYPE_DOOR_SENSOR)),
             //motion sensor with illuminance
-            new SimpleEntry<String, ThingDescription>("lumi.sensor_motion.aq2", new ThingDescription("Aqara", "Motion Sensor", "RTCGQ11LM", THING_TYPE_MOTION_SENSOR_WITH_LUX))
-
+            new SimpleEntry<String, ThingDescription>("lumi.sensor_motion.aq2", new ThingDescription("Aqara", "Motion Sensor", "RTCGQ11LM", THING_TYPE_MOTION_SENSOR_WITH_LUX)),
+            //
+            new SimpleEntry<String, ThingDescription>("lumi.sen_ill.mgl01", new ThingDescription("Xiaomi", "Light Sensor", "GZCGQ01LM", THING_TYPE_LIGHT_SENSOR))
             );    
 
     
@@ -123,5 +125,8 @@ public final class XiaomiGatewayV3BindingConstants {
     public static final String ILLUMINANCE_LUX = "illuminance_lux";                 //0.3.85
     public static final String ILLUMINANTION = "illumination";                      //0.4.85
 
+    //for light sensor (GZCGQ01LM)
+    public static final String LIGHT_SENSOR_ILLUMINANCE = "light_sensor_illuminance";       //2.1
+    public static final String LIGHT_SENSOR_BATTERY = "light_sensor_battery";               //3.1
 
 }

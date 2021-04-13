@@ -28,6 +28,7 @@ import org.osgi.service.component.annotations.Component;
 
 import org.openhab.binding.xiaomigatewayv3.internal.handlers.XiaomiGatewayV3BridgeHandler;
 import org.openhab.binding.xiaomigatewayv3.internal.handlers.DoorWindowSensorThingHandler;
+import org.openhab.binding.xiaomigatewayv3.internal.handlers.LightSensorThingHandler;
 import org.openhab.binding.xiaomigatewayv3.internal.handlers.MotionSensorWithLuxThingHandler;
 
 import org.openhab.binding.xiaomigatewayv3.internal.miio.cloud.CloudConnector;
@@ -89,6 +90,8 @@ public class XiaomiGatewayV3HandlerFactory extends BaseThingHandlerFactory {
             return new DoorWindowSensorThingHandler(thing);
         } else if (thingTypeUID.equals(THING_TYPE_MOTION_SENSOR_WITH_LUX)) {
             return new MotionSensorWithLuxThingHandler(thing);
+        } else if (thingTypeUID.equals(THING_TYPE_LIGHT_SENSOR)) {
+            return new LightSensorThingHandler(thing);
         }
 
         return null;
