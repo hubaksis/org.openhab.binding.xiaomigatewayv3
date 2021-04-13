@@ -70,18 +70,26 @@ To compile - I use the command: mvn clean install -D"spotless.check.skip"=true -
 
 ## To add a new device
 1. XiaomiGatewayV3BindingConstants.java
+
     a. Add a new ThingTypeUID like THING_TYPE_DOOR_SENSOR
+
     b. Add this ThingTypeUID to the SUPPORTED_THING_TYPES_UIDS    
+
     c. Add device description to the ThingDescriptions list.
+
     d. Add specific channels to the Specific sensor channels section
 
 2. thing-types.xml
+
     a. Add new channel-type to the bottom of the file with the same IDs as from step 1-d
+
     b. Add new thing-type to the file with the same ID as in the step 1-a
 
 3. Create a new file YourNewSensorThingHandler.java based on DoorWindowSensorThingHandler.java in the handlers folder.
+
     a. Fill in LocalParamCollection with the properties from steps 1-d 
 
 4. XiaomiGatewayV3HandlerFactory.java
+
     a. Add your new class to the createHandler method (based on ThingTypeUID from step 1-a)
 
