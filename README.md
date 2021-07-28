@@ -16,6 +16,7 @@ While initializing - binding tries to enable telnet service on the device. See d
 
 All code for communication via MiIO protocol was taken from miio openhab binding.
 
+Works with openhab 3.2.0
 
 ## Supported Things
 
