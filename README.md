@@ -68,7 +68,7 @@ _Note that it is planned to generate some part of this based on the XML files wi
 
 To compile - I use the command: mvn clean install -D"spotless.check.skip"=true -DskipChecks
 
-## (For developers) to add support of a new ZigBee device
+## (For developers) to add support of a new ZigBee device (not a bluetooth one)
 
 1. XiaomiGatewayV3BindingConstants.java
 
@@ -93,4 +93,5 @@ To compile - I use the command: mvn clean install -D"spotless.check.skip"=true -
 4. XiaomiGatewayV3HandlerFactory.java
 
     a. Add your new class to the createHandler method (based on ThingTypeUID from step 1-a)
+   
 
