@@ -23,6 +23,7 @@ Works with openhab 3.2.0
 - Xiaomi/Aquara Door Sensor (MCCGQ01LM)
 - Aqara Motion Sensor (RTCGQ11LM)
 - Xiaomi Light Sensor (GZCGQ01LM)
+- Xaiomi Motion Sensor (RTCGQ01LM)
 
 ## Discovery
 
