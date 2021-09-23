@@ -91,7 +91,22 @@
 	</thing-type>
 
 
+	<!-- Motion sensor (RTCGQ01LM) -->
+	<thing-type id="motion_sensor">
 
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="config"/>
+		</supported-bridge-type-refs>
+
+		<label>Motion sensor</label>
+		<description>Xiaomi motion sensor (RTCGQ01LM)</description>
+
+		<channels>
+			<channel id="motion_sensor_state" typeId="motion_sensor_state"/>
+			<channel id="global_battery_percent" typeId="global_battery_percent"/>
+		</channels>
+		<config-description-ref uri="thing-type:xiaomigatewayv3:zigbee:config"/>
+	</thing-type>
 
 	
 	<!-- Bridge channels -->
