@@ -24,7 +24,8 @@ Works with openhab 3.2.0
 - Aqara Motion Sensor (RTCGQ11LM)
 - Xiaomi Light Sensor (GZCGQ01LM)
 - Xaiomi Motion Sensor (RTCGQ01LM)
-
+- Aqara Vibration Sensor (DJT11LM)
+- Aqara Water Leak Sensor (SJCGQ11LM)
 ## Discovery
 
 The binding can find attached supported ZigBee devices now.
