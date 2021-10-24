@@ -53,10 +53,14 @@ public final class XiaomiGatewayV3BindingConstants {
    // Motion sensor (RTCGQ01LM)
    public static final ThingTypeUID THING_TYPE_MOTION_SENSOR = new ThingTypeUID(BINDING_ID, "motion_sensor");
 
+   public static final ThingTypeUID THING_TYPE_VIBRATION_SENSOR = new ThingTypeUID(BINDING_ID, "vibration_sensor");
+
+   public static final ThingTypeUID THING_TYPE_WATER_LEAK_SENSOR = new ThingTypeUID(BINDING_ID, "water_leak_sensor");
 
     public static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Collections
             .unmodifiableSet(Stream.of(THING_TYPE_BRIDGE, THING_TYPE_DOOR_SENSOR, THING_TYPE_MOTION_SENSOR_WITH_LUX,
-                                    THING_TYPE_LIGHT_SENSOR, THING_TYPE_MOTION_SENSOR)
+                                    THING_TYPE_LIGHT_SENSOR, THING_TYPE_MOTION_SENSOR, THING_TYPE_VIBRATION_SENSOR,
+                                    THING_TYPE_WATER_LEAK_SENSOR)
                     .collect(Collectors.toSet()));
                     
     //# All lumi models:
@@ -73,7 +77,12 @@ public final class XiaomiGatewayV3BindingConstants {
             //
             new SimpleEntry<String, ThingDescription>("lumi.sen_ill.mgl01", new ThingDescription("Xiaomi", "Light Sensor", "GZCGQ01LM", THING_TYPE_LIGHT_SENSOR)), 
 
-            new SimpleEntry<String, ThingDescription>("lumi.sensor_motion", new ThingDescription("Xiaomi", "Motion Sensor", "RTCGQ01LM", THING_TYPE_MOTION_SENSOR))
+            new SimpleEntry<String, ThingDescription>("lumi.sensor_motion", new ThingDescription("Xiaomi", "Motion Sensor", "RTCGQ01LM", THING_TYPE_MOTION_SENSOR)), 
+            
+            //vibration sensor DJT11LM
+            new SimpleEntry<String, ThingDescription>("lumi.vibration.aq1", new ThingDescription("Aqara", "Vibration Sensor", "DJT11LM", THING_TYPE_VIBRATION_SENSOR)),
+
+            new SimpleEntry<String, ThingDescription>("lumi.sensor_wleak.aq1", new ThingDescription("Aqara", "Water Leak Sensor", "SJCGQ11LM", THING_TYPE_WATER_LEAK_SENSOR))
             );    
 
     
@@ -135,4 +144,14 @@ public final class XiaomiGatewayV3BindingConstants {
     public static final String LIGHT_SENSOR_ILLUMINANCE = "light_sensor_illuminance";       //2.1
     public static final String LIGHT_SENSOR_BATTERY = "light_sensor_battery";               //3.1
 
+
+    //for vibration sensor (DJT11LM)
+    public static final String VIBRATION_SENSOR_BED_ACTIVIRY = "vibration_sensor_bed_activity";              //0.1.85
+    public static final String VIBRATION_SENSOR_TILT_ANGLE = "vibration_sensor_tilt_angle";                  //0.2.85
+    public static final String VIBRATION_SENSOR_VIBRATE_INTENSITY = "vibration_sensor_vibrate_intensity";    //0.3.85
+    public static final String VIBRATION_SENSOR_VIBRATION = "vibration_sensor_vibration";                    //13.1.85
+    public static final String VIBRATION_SENSOR_VIBRATION_LEVEL = "vibration_sensor_vibration_level";        //14.1.85
+
+    //for water leak sensor (SJCGQ11LM)
+    public static final String WATER_LEAK_SENSOR_ALARM = "water_leak_sensor_alarm";                     // 3.1.85
 }

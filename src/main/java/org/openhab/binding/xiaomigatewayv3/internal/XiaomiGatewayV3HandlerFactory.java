@@ -26,11 +26,7 @@ import org.openhab.core.thing.binding.ThingHandler;
 import org.openhab.core.thing.binding.ThingHandlerFactory;
 import org.osgi.service.component.annotations.Component;
 
-import org.openhab.binding.xiaomigatewayv3.internal.handlers.XiaomiGatewayV3BridgeHandler;
-import org.openhab.binding.xiaomigatewayv3.internal.handlers.DoorWindowSensorThingHandler;
-import org.openhab.binding.xiaomigatewayv3.internal.handlers.LightSensorThingHandler;
-import org.openhab.binding.xiaomigatewayv3.internal.handlers.MotionSensorWithLuxThingHandler;
-import org.openhab.binding.xiaomigatewayv3.internal.handlers.MotionSensorThingHandler;
+import org.openhab.binding.xiaomigatewayv3.internal.handlers.*;
 
 import org.openhab.binding.xiaomigatewayv3.internal.miio.cloud.CloudConnector;
 import org.osgi.service.component.annotations.Reference;
@@ -39,8 +35,8 @@ import org.openhab.core.common.ThreadPoolManager;
 import org.osgi.service.component.annotations.Activate;
 import java.util.Map;
 
-// import org.slf4j.Logger;
-// import org.slf4j.LoggerFactory;
+ // import org.slf4j.Logger;
+ // import org.slf4j.LoggerFactory;
 
 /**
  * The {@link XiaomiGatewayV3HandlerFactory} is responsible for creating things and thing
@@ -95,7 +91,11 @@ public class XiaomiGatewayV3HandlerFactory extends BaseThingHandlerFactory {
             return new LightSensorThingHandler(thing);
         } else if (thingTypeUID.equals(THING_TYPE_MOTION_SENSOR)) {
             return new MotionSensorThingHandler(thing);
-        }
+        } else if (thingTypeUID.equals(THING_TYPE_VIBRATION_SENSOR)){
+            return new VibrationSensorThingHandler(thing);
+        } else if (thingTypeUID.equals(THING_TYPE_WATER_LEAK_SENSOR)){
+            return new WaterLeakSensorThingHandler(thing);
+        }        
 
         return null;
     }

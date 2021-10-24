@@ -265,7 +265,12 @@ public class XiaomiGatewayV3BridgeHandler extends BaseBridgeHandler
                             if(thingDId != null && thingDId.toString().equals(message.getDeviceId())){
                                 logger.info("Found did: {}", thingDId);
                                 if(thing.getHandler() != null)
-                                    ((AbstractXiaomiGatewayV3ThingHandler) thing.getHandler()).updateProperties(message.params);
+                                   {
+                                        logger.debug("Thing handler is NOT null - updating properties"); 
+                                       ((AbstractXiaomiGatewayV3ThingHandler) thing.getHandler()).updateProperties(message.params);
+                                   }
+                                else
+                                    logger.debug("Thing handler is null - should not happen");
                             }
                         }
                     }

@@ -108,6 +108,46 @@
 		<config-description-ref uri="thing-type:xiaomigatewayv3:zigbee:config"/>
 	</thing-type>
 
+	<!-- Vibration Sensor (DJT11LM) -->
+
+	<thing-type id="vibration_sensor">
+
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="config"/>
+		</supported-bridge-type-refs>
+
+		<label>Vibration Sensor</label>
+		<description>Aqara Vibration Sensor (DJT11LM)</description>
+
+		<channels>
+			<channel id="vibration_sensor_bed_activity" typeId="vibration_sensor_bed_activity"/>
+			<channel id="vibration_sensor_tilt_angle" typeId="vibration_sensor_tilt_angle"/>
+			<channel id="vibration_sensor_vibrate_intensity" typeId="vibration_sensor_vibrate_intensity"/>
+			<channel id="vibration_sensor_vibration" typeId="vibration_sensor_vibration"/>
+			<channel id="vibration_sensor_vibration_level" typeId="vibration_sensor_vibration_level"/>
+
+			<channel id="global_battery_percent" typeId="global_battery_percent"/>
+		</channels>
+		<config-description-ref uri="thing-type:xiaomigatewayv3:zigbee:config"/>
+	</thing-type>
+
+	<!-- Water leak sensor (SJCGQ11LM) -->
+	<thing-type id="water_leak_sensor">
+
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="config"/>
+		</supported-bridge-type-refs>
+
+		<label>Water leak sensor</label>
+		<description>Aqara water leak sensor (SJCGQ11LM)</description>
+
+		<channels>
+			<channel id="water_leak_sensor_alarm" typeId="water_leak_sensor_alarm"/>
+			<channel id="global_battery_percent" typeId="global_battery_percent"/>
+		</channels>
+		<config-description-ref uri="thing-type:xiaomigatewayv3:zigbee:config"/>
+	</thing-type>
+
 	
 	<!-- Bridge channels -->
 	<channel-type id="bridge_heartbeat">
@@ -213,6 +253,45 @@
 		<label>Battery</label>
 		<description>Battery</description> 
 		<state pattern="%d" readOnly="true"/>
+	</channel-type>
+
+	<!-- Vibration sensor DJT11LM -->
+	<channel-type id="vibration_sensor_bed_activity">
+		<item-type>Number</item-type>
+		<label>bed_activity</label>		
+		<state pattern="%d" readOnly="true"/>
+	</channel-type>
+
+	<channel-type id="vibration_sensor_tilt_angle">
+		<item-type>Number</item-type>
+		<label>tilt_angle</label>		
+		<state pattern="%d" readOnly="true"/>
+	</channel-type>
+
+	<channel-type id="vibration_sensor_vibrate_intensity">
+		<item-type>Number</item-type>
+		<label>vibrate_intensity</label>		
+		<state pattern="%d" readOnly="true"/>
+	</channel-type>
+
+	<channel-type id="vibration_sensor_vibration">
+		<item-type>Number</item-type>
+		<label>vibration</label>		
+		<state pattern="%d" readOnly="true"/>
+	</channel-type>
+
+	<channel-type id="vibration_sensor_vibration_level">
+		<item-type>Number</item-type>
+		<label>vibration_level</label>		
+		<state pattern="%d" readOnly="true"/>
+	</channel-type>
+
+	<!-- Water leak sensor SJCGQ11LM-->
+	<channel-type id="water_leak_sensor_alarm">
+		<item-type>Contact</item-type>
+		<label>Sensor state</label>
+		<description>Water leak sensor state</description> 
+		<state readOnly="true"/>
 	</channel-type>
 
 

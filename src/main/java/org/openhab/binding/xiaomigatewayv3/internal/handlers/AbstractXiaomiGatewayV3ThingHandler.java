@@ -151,7 +151,7 @@ public class AbstractXiaomiGatewayV3ThingHandler extends BaseThingHandler {
     }
 
     public void updateProperties(@Nullable List<ZigbeeSendMessageReportParams> params){
-        fillParamsFromCollection(params, GlobalParamsCollection);
+       fillParamsFromCollection(params, GlobalParamsCollection);
 
         if(LocalParamCollection != null && !LocalParamCollection.isEmpty())
             fillParamsFromCollection(params, LocalParamCollection);
