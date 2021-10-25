@@ -115,6 +115,7 @@ public final class XiaomiGatewayV3BindingConstants {
     // List of all Channel ids
     //Bridge
     public static final String BRIDGE_HEARTBEAT = "bridge_heartbeat";
+    public static final String BRIDGE_PAIRING_MODE = "bridge_pairing_mode_command";
 
     //Global Zigbee devices properties
     //source: https://github.com/AlexxIT/XiaomiGateway3/blob/master/custom_components/xiaomi_gateway3/core/utils.py

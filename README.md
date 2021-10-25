@@ -54,15 +54,25 @@ All supported devices should be added to your Inbox
 
 ## Channels
 
-ToDO 
-
-_Here you should provide information about available channel types, what their meaning is and how they can be used._
-
-_Note that it is planned to generate some part of this based on the XML files within ```src/main/resources/OH-INF/thing``` of your binding._
+### Binding itself
 
 | channel  | type   | description                  |
 |----------|--------|------------------------------|
-| control  | Switch | This is the control channel  |
+| Bridge heartbeat message  | String | (not used yet)  |
+| Trigger pairing mode  | String | Activates gateway pairing mode  |
+
+
+### Motion sensor
+| channel  | type   | description                  |
+|----------|--------|------------------------------|
+| Sensor state  | Contact | With the motions sensor there is a hint. It sends only when the movement happened (will the state OPEN), however it doesn't send state CLOSED. So it's better to create an expiration timer (in metadata) on a item |
+
+### Water leak sensor
+| channel  | type   | description                  |
+|----------|--------|------------------------------|
+| Sensor state  | Contact | Sends OPEN when the contacts are closed, sends CLOSED when the contact are opened again |
+
+### TODO everything else...
 
 
 ## Any custom content here!

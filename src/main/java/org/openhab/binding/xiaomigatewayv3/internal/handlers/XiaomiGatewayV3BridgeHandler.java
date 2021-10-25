@@ -28,7 +28,9 @@ import org.openhab.core.types.Command;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
- import org.openhab.core.io.transport.mqtt.MqttBrokerConnection;
+//import javassist.expr.Instanceof;
+
+import org.openhab.core.io.transport.mqtt.MqttBrokerConnection;
  import org.openhab.core.io.transport.mqtt.MqttConnectionObserver;
  import org.openhab.core.io.transport.mqtt.MqttConnectionState;
  import org.openhab.core.io.transport.mqtt.MqttMessageSubscriber;
@@ -60,6 +62,8 @@ import org.openhab.binding.xiaomigatewayv3.internal.helpers.MIIOCommunication;
 import org.openhab.binding.xiaomigatewayv3.internal.discovery.XiaomiGatewayV3Discovery;
 import org.openhab.core.thing.binding.ThingHandlerService;
 
+import static org.openhab.binding.xiaomigatewayv3.internal.XiaomiGatewayV3BindingConstants.*;
+
 
 /**
  * The {@link XiaomiGatewayV3BridgeHandler} bridgeHandler implementation
@@ -77,6 +81,8 @@ public class XiaomiGatewayV3BridgeHandler extends BaseBridgeHandler
     private @Nullable XiaomiGatewayV3Discovery discoveryService;
 
     private String topicsToSubscribe = "#";
+
+    private @Nullable String mqttUniqueTopic = null;    
 
     private int connectionMQTTAttempts = 0;
     private final int MAX_MQTT_CONNECTION_ATTEMPTS = 3;
@@ -109,9 +115,31 @@ public class XiaomiGatewayV3BridgeHandler extends BaseBridgeHandler
         this.cloudConnector = cloudConnector;        
     }
 
+    String PAIRING_MQTT_MSG = "{\"commands\": [{\"command\": \"lumi open-with-cloud-install-code 0x3c\",\"postDelayMs\": 0}]}";
+
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
-        
+        try {
+            switch (channelUID.getId()) {
+                case BRIDGE_PAIRING_MODE:
+                    if(mqttUniqueTopic == null) {
+                        logger.warn("Haven't received any heartbeat messages yet, cannot detect topic for pairing. Please try again in a couple of minutes.");                        
+                    } else {
+                        if(command.toString().equals("PAIRING_MODE")) {
+                            logger.info("Turning on pairing mode");
+                            if(connection != null){                            
+                                connection.publish("gw/" + mqttUniqueTopic + "/commands", PAIRING_MQTT_MSG.getBytes(), 1, false);
+                            }
+                        }
+                    }                    
+                    break;                
+            }
+            //statusUpdated(ThingStatus.ONLINE);
+        } catch(Exception ex) {
+            // catch exceptions and handle it in your binding
+            //statusUpdated(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR, ex.getMessage());
+            logger.error("Error handling the command: " + ex.toString());
+        }
     }
 
     @Override
@@ -327,10 +355,20 @@ public class XiaomiGatewayV3BridgeHandler extends BaseBridgeHandler
         String state = new String(payload, StandardCharsets.UTF_8);
         logger.debug("Message received. Topic: {}, payload: {}", topic, state);
         
-        if(topic.startsWith("gw/") && topic.endsWith("heartbeat")){
-            //update binding heartbeat
-            //2021-03-31 19:17:32.221 [WARN ] [.core.thing.binding.BaseThingHandler] - Handler XiaomiGatewayV3BridgeHandler of thing xiaomigatewayv3:config:xiaomi_bridge tried updating channel bridge_heartbeat although the handler was already disposed.
-            //updateState(new ChannelUID(getThing().getUID(), XiaomiGatewayV3BindingConstants.BRIDGE_HEARTBEAT), new StringType(state)); 
+        if(topic.startsWith("gw/")){
+            if(mqttUniqueTopic == null)
+            {
+                mqttUniqueTopic = topic.replace("gw/", "");
+                mqttUniqueTopic = mqttUniqueTopic.substring(0, mqttUniqueTopic.indexOf("/"));
+                logger.info("Received a message and saved the topic for future pairing commands: " + mqttUniqueTopic);
+            }
+
+            if(topic.endsWith("heartbeat"))
+            {
+                //update binding heartbeat
+                //2021-03-31 19:17:32.221 [WARN ] [.core.thing.binding.BaseThingHandler] - Handler XiaomiGatewayV3BridgeHandler of thing xiaomigatewayv3:config:xiaomi_bridge tried updating channel bridge_heartbeat although the handler was already disposed.
+                //updateState(new ChannelUID(getThing().getUID(), XiaomiGatewayV3BindingConstants.BRIDGE_HEARTBEAT), new StringType(state)); 
+            }
         } else if(topic.equals("zigbee/send")) {
             processThingMessage(state);
         }
