@@ -95,7 +95,9 @@ public class XiaomiGatewayV3HandlerFactory extends BaseThingHandlerFactory {
             return new VibrationSensorThingHandler(thing);
         } else if (thingTypeUID.equals(THING_TYPE_WATER_LEAK_SENSOR)){
             return new WaterLeakSensorThingHandler(thing);
-        }        
+        } else if (thingTypeUID.equals(THING_TYPE_SMOKE_SENSOR)){
+            return new SmokeSensorThingHandler(thing);
+        }  
 
         return null;
     }

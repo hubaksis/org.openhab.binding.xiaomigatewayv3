@@ -57,10 +57,14 @@ public final class XiaomiGatewayV3BindingConstants {
 
    public static final ThingTypeUID THING_TYPE_WATER_LEAK_SENSOR = new ThingTypeUID(BINDING_ID, "water_leak_sensor");
 
+   // Honeywell Smoke sensor (JTYJ-GD-01LM/BW)
+   public static final ThingTypeUID THING_TYPE_SMOKE_SENSOR = new ThingTypeUID(BINDING_ID, "smoke_sensor");
+
+
     public static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Collections
             .unmodifiableSet(Stream.of(THING_TYPE_BRIDGE, THING_TYPE_DOOR_SENSOR, THING_TYPE_MOTION_SENSOR_WITH_LUX,
                                     THING_TYPE_LIGHT_SENSOR, THING_TYPE_MOTION_SENSOR, THING_TYPE_VIBRATION_SENSOR,
-                                    THING_TYPE_WATER_LEAK_SENSOR)
+                                    THING_TYPE_WATER_LEAK_SENSOR, THING_TYPE_SMOKE_SENSOR)
                     .collect(Collectors.toSet()));
                     
     //# All lumi models:
@@ -82,7 +86,9 @@ public final class XiaomiGatewayV3BindingConstants {
             //vibration sensor DJT11LM
             new SimpleEntry<String, ThingDescription>("lumi.vibration.aq1", new ThingDescription("Aqara", "Vibration Sensor", "DJT11LM", THING_TYPE_VIBRATION_SENSOR)),
 
-            new SimpleEntry<String, ThingDescription>("lumi.sensor_wleak.aq1", new ThingDescription("Aqara", "Water Leak Sensor", "SJCGQ11LM", THING_TYPE_WATER_LEAK_SENSOR))
+            new SimpleEntry<String, ThingDescription>("lumi.sensor_wleak.aq1", new ThingDescription("Aqara", "Water Leak Sensor", "SJCGQ11LM", THING_TYPE_WATER_LEAK_SENSOR)),
+
+            new SimpleEntry<String, ThingDescription>("lumi.sensor_smoke.v1", new ThingDescription("Honeywell", "Smoke Sensor", "JTYJ-GD-01LM/BW", THING_TYPE_SMOKE_SENSOR))
             );    
 
     
@@ -155,4 +161,8 @@ public final class XiaomiGatewayV3BindingConstants {
 
     //for water leak sensor (SJCGQ11LM)
     public static final String WATER_LEAK_SENSOR_ALARM = "water_leak_sensor_alarm";                     // 3.1.85
+
+    //for smoke sensor Honeywell (JTYJ-GD-01LM/BW)
+    public static final String SMOKE_SENSOR_SMOKE_DENSITY = "smoke_sensor_smoke_density";             //0.1.85
+    public static final String SMOKE_SENSOR_ALARM = "smoke_sensor_alarm";                            //13.1.85
 }

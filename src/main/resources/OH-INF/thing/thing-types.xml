@@ -149,7 +149,24 @@
 		<config-description-ref uri="thing-type:xiaomigatewayv3:zigbee:config"/>
 	</thing-type>
 
-	
+	<!-- Honeywell smoke sensor (JTYJ-GD-01LM/BW) -->
+	<thing-type id="smoke_sensor">
+
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="config"/>
+		</supported-bridge-type-refs>
+
+		<label>Smoke sensor</label>
+		<description>Honeywell smoke sensor (JTYJ-GD-01LM/BW)</description>
+
+		<channels>
+			<channel id="smoke_sensor_alarm" typeId="smoke_sensor_alarm"/>
+			<channel id="smoke_sensor_smoke_density" typeId="smoke_sensor_smoke_density"/>
+			<channel id="global_battery_voltage" typeId="global_battery_voltage"/>
+		</channels>
+		<config-description-ref uri="thing-type:xiaomigatewayv3:zigbee:config"/>
+	</thing-type>
+
 	<!-- Bridge channels -->
 	<channel-type id="bridge_heartbeat">
 		<item-type>String</item-type>
@@ -309,6 +326,20 @@
 	</channel-type>
 
 
+	<!-- Honeywell smoke sensor JTYJ-GD-01LM/BW-->
+	<channel-type id="smoke_sensor_alarm">
+		<item-type>Contact</item-type>
+		<label>Sensor alarm</label>
+		<description>Smoke sensor state</description> 
+		<state readOnly="true"/>
+	</channel-type>
+
+	<channel-type id="smoke_sensor_smoke_density">
+		<item-type>Number</item-type>
+		<label>Smoke density</label>		
+		<state pattern="%d" readOnly="true"/>
+	</channel-type>
+	
 	<!-- END: Specific device properties-->
 	
 </thing:thing-descriptions>

@@ -265,8 +265,17 @@ public class MIIOCommunication implements MiIoMessageListener{
             if (MiIoCommand.MIIO_INFO.equals(response.getCommand())) {
                 network.invalidateValue();
             }
-            return;
+
+            //ignoring telnet response issue and trying to connect anyway as per descussion https://community.openhab.org/t/xiaomi-gateway-3-binding-zndmwg03lm/117759/75?u=dexter 
+            switch (response.getCommand()){
+                case TELNET_ENABLE:
+                    logger.debug("Error in response for TELNET_ENABLE command. Ignoring and continuing.");
+                    break;
+                default:
+                    return;
+            }
         }
+        
         try {
             switch (response.getCommand()) {
                 // case MIIO_INFO:
