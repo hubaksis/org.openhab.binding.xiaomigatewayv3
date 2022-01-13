@@ -26,6 +26,8 @@ Works with openhab 3.2.0
 - Xaiomi Motion Sensor (RTCGQ01LM)
 - Aqara Vibration Sensor (DJT11LM)
 - Aqara Water Leak Sensor (SJCGQ11LM)
+- Honeywell Smoke Sensor (JTYJ-GD-01LM/BW)
+
 ## Discovery
 
 The binding can find attached supported ZigBee devices now.
