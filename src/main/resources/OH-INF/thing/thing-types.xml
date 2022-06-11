@@ -167,6 +167,22 @@
 		<config-description-ref uri="thing-type:xiaomigatewayv3:zigbee:config"/>
 	</thing-type>
 
+	<!-- Aqara Single Wall Button (WXKG03LM) -->
+	<thing-type id="single_wall_button">
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="config"/>
+		</supported-bridge-type-refs>
+
+		<label>Single wall button</label>
+		<description>Aquara Single wall button (WXKG03LM)</description>
+		<channels>
+			<channel id="single_wall_button_pressed" typeId="single_wall_button_pressed"/>			
+			<channel id="global_battery_voltage" typeId="global_battery_voltage"/>
+		</channels>
+		<config-description-ref uri="thing-type:xiaomigatewayv3:zigbee:config"/>
+	</thing-type>
+
+
 	<!-- Bridge channels -->
 	<channel-type id="bridge_heartbeat">
 		<item-type>String</item-type>
@@ -340,6 +356,15 @@
 		<state pattern="%d" readOnly="true"/>
 	</channel-type>
 	
+
+	<!-- Aqara Single Wall Button WXKG03LM -->
+	<channel-type id="single_wall_button_pressed">
+		<item-type>Contact</item-type>
+		<label>Button pressed</label>
+		<description>Button state</description> 
+		<state readOnly="true"/>
+	</channel-type>
+
 	<!-- END: Specific device properties-->
 	
 </thing:thing-descriptions>

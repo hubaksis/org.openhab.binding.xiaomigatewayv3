@@ -60,11 +60,13 @@ public final class XiaomiGatewayV3BindingConstants {
    // Honeywell Smoke sensor (JTYJ-GD-01LM/BW)
    public static final ThingTypeUID THING_TYPE_SMOKE_SENSOR = new ThingTypeUID(BINDING_ID, "smoke_sensor");
 
+   // Aqara Single Wall Button WXKG03LM
+   public static final ThingTypeUID THING_TYPE_SINGLE_WALL_BUTTON = new ThingTypeUID(BINDING_ID, "single_wall_button");
 
     public static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Collections
             .unmodifiableSet(Stream.of(THING_TYPE_BRIDGE, THING_TYPE_DOOR_SENSOR, THING_TYPE_MOTION_SENSOR_WITH_LUX,
                                     THING_TYPE_LIGHT_SENSOR, THING_TYPE_MOTION_SENSOR, THING_TYPE_VIBRATION_SENSOR,
-                                    THING_TYPE_WATER_LEAK_SENSOR, THING_TYPE_SMOKE_SENSOR)
+                                    THING_TYPE_WATER_LEAK_SENSOR, THING_TYPE_SMOKE_SENSOR, THING_TYPE_SINGLE_WALL_BUTTON)
                     .collect(Collectors.toSet()));
                     
     //# All lumi models:
@@ -88,7 +90,9 @@ public final class XiaomiGatewayV3BindingConstants {
 
             new SimpleEntry<String, ThingDescription>("lumi.sensor_wleak.aq1", new ThingDescription("Aqara", "Water Leak Sensor", "SJCGQ11LM", THING_TYPE_WATER_LEAK_SENSOR)),
 
-            new SimpleEntry<String, ThingDescription>("lumi.sensor_smoke.v1", new ThingDescription("Honeywell", "Smoke Sensor", "JTYJ-GD-01LM/BW", THING_TYPE_SMOKE_SENSOR))
+            new SimpleEntry<String, ThingDescription>("lumi.sensor_smoke.v1", new ThingDescription("Honeywell", "Smoke Sensor", "JTYJ-GD-01LM/BW", THING_TYPE_SMOKE_SENSOR)),
+
+            new SimpleEntry<String, ThingDescription>("lumi.sensor_86sw1.v1", new ThingDescription("Aqara", "Single Wall Button", "WXKG03LM", THING_TYPE_SINGLE_WALL_BUTTON))
             );    
 
     
@@ -165,4 +169,7 @@ public final class XiaomiGatewayV3BindingConstants {
     //for smoke sensor Honeywell (JTYJ-GD-01LM/BW)
     public static final String SMOKE_SENSOR_SMOKE_DENSITY = "smoke_sensor_smoke_density";             //0.1.85
     public static final String SMOKE_SENSOR_ALARM = "smoke_sensor_alarm";                            //13.1.85
+
+    //for aqara Single Wall Button WXKG03LM
+    public static final String SINGLE_WALL_BUTTON_PRESSED = "single_wall_button_pressed";                    //13.1.85
 }
